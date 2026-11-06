@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --upgrade yt-dlp
+# Added --break-system-packages to bypass the Debian environment restriction
+RUN pip3 install --upgrade --break-system-packages yt-dlp
 
 WORKDIR /app
 COPY target/*.jar app.jar
