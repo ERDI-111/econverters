@@ -265,6 +265,57 @@
         }
         .status-box.error { color: #f87171; }
         .status-box.success { color: #34d399; }
+
+        /* Modal Popup Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 15, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: #121629;
+            border: 1px solid var(--border-glow);
+            padding: 32px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: none; border: none;
+            color: var(--text-sub);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            background: rgba(8, 11, 24, 0.8);
+            border: 1.5px solid var(--border-glow);
+            border-radius: 12px;
+            color: #fff;
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -272,8 +323,8 @@
     <header>
         <div class="logo">⚡ EconverterS</div>
         <div class="nav-actions">
-            <button class="btn-ghost" onclick="alert('Login Modal Triggered')">Sign In</button>
-            <button class="btn-glow" onclick="alert('Signup Modal Triggered')">Get Started</button>
+            <button class="btn-ghost" id="signInNavBtn">Sign In</button>
+            <button class="btn-glow" id="getStartedNavBtn">Get Started</button>
         </div>
     </header>
 
@@ -323,7 +374,52 @@
         </div>
     </div>
 
+    <!-- Reusable Functional Modal Container -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h3 id="modalTitle">Sign In</h3>
+            <form id="authForm">
+                <input type="email" class="modal-input" placeholder="Email address" required>
+                <input type="password" class="modal-input" placeholder="Password" required>
+                <button type="submit" class="submit-btn" id="modalSubmitBtn">Continue</button>
+            </form>
+        </div>
+    </div>
+
     <script>
+        // Modal Functionality
+        const modalOverlay = document.getElementById('authModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalClose = document.getElementById('modalClose');
+        const signInNavBtn = document.getElementById('signInNavBtn');
+        const getStartedNavBtn = document.getElementById('getStartedNavBtn');
+
+        signInNavBtn.addEventListener('click', () => {
+            modalTitle.innerText = 'Welcome Back';
+            modalOverlay.classList.add('active');
+        });
+
+        getStartedNavBtn.addEventListener('click', () => {
+            modalTitle.innerText = 'Create Account';
+            modalOverlay.classList.add('active');
+        });
+
+        modalClose.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+        });
+
+        document.getElementById('authForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Authentication simulated successfully!');
+            modalOverlay.classList.remove('active');
+        });
+
+        // Conversion Functionality
         const form = document.getElementById('convertForm');
         const submitBtn = document.getElementById('submitBtn');
         const statusBox = document.getElementById('statusBox');
@@ -364,7 +460,6 @@
                 statusBox.className = 'status-box success';
                 statusBox.innerText = 'Success! Download started.';
 
-                // Add to History Feed
                 if (emptyMsg) emptyMsg.style.display = 'none';
                 const item = document.createElement('div');
                 item.className = 'history-item';
