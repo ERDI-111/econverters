@@ -18,6 +18,10 @@ ENV PATH="/root/.deno/bin:$PATH"
 
 WORKDIR /app
 COPY . .
+
+# Grant execute permissions to the Maven wrapper script
+RUN chmod +x mvnw
+
 RUN ./mvnw clean package -DskipTests
 
 EXPOSE 8080
