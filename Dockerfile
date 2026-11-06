@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     ffmpeg \
     nodejs \
-    && ln -sf /usr/bin/nodejs /usr/bin/node \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --upgrade --break-system-packages yt-dlp
