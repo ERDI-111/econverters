@@ -1,12 +1,13 @@
 FROM eclipse-temurin:17-jdk-jammy
 
-# Install Python, pip, ffmpeg, curl, and unzip
+# Install Python, pip, ffmpeg, curl, unzip, and maven
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     ffmpeg \
     curl \
     unzip \
+    maven \
     && rm -rf /var/lib/apt/lists/*
 
 # Install latest yt-dlp
@@ -19,10 +20,8 @@ ENV PATH="/root/.deno/bin:$PATH"
 WORKDIR /app
 COPY . .
 
-# Grant execute permissions to the Maven wrapper script
-RUN chmod +x mvnw
-
-RUN ./mvnw clean package -DskipTests
+# Build using standard system maven
+RUN mvn clean package -DskipTests
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "target/econverter-0.0.1-SNAPSHOT.jar"]
