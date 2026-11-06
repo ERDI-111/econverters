@@ -1,18 +1,24 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:17-jdk-jammy
 
+# Install Python, pip, ffmpeg, curl, and unzip
 RUN apt-get update && apt-get install -y \
-    maven \
     python3 \
     python3-pip \
     ffmpeg \
-    nodejs \
+    curl \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --upgrade --break-system-packages yt-dlp
+# Install latest yt-dlp
+RUN pip3 install --no-cache-dir --upgrade yt-dlp
+
+# Install Deno (automatically recognized by yt-dlp as the default JS runtime)
+RUN curl -fsSL https://deno.land/install.sh | sh
+ENV PATH="/root/.deno/bin:$PATH"
 
 WORKDIR /app
 COPY . .
-RUN mvn clean package -DskipTests
+RUN ./mvnw clean package -DskipTests
 
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "java -jar target/*.jar"]
+ENTRYPOINT ["java", "-jar", "target/econverter-0.0.1-SNAPSHOT.jar"]
