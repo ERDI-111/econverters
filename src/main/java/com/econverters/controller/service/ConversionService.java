@@ -19,6 +19,7 @@ public class ConversionService {
             processBuilder = new ProcessBuilder(
                 "yt-dlp",
                 "--extractor-args", "youtube:player_client=android",
+                "--js-runtimes", "node",
                 "-x", "--audio-format", "mp3",
                 "-o", outputTemplate,
                 videoUrl
@@ -27,6 +28,7 @@ public class ConversionService {
             processBuilder = new ProcessBuilder(
                 "yt-dlp",
                 "--extractor-args", "youtube:player_client=android",
+                "--js-runtimes", "node",
                 "-f", "bestvideo+bestaudio/best",
                 "--merge-output-format", "mp4",
                 "-o", outputTemplate,
