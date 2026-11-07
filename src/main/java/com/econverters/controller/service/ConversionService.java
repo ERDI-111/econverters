@@ -24,11 +24,18 @@ public class ConversionService {
 
         ResponseEntity response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, Map.class);
         
-        if (response.getBody() == null || !response.getBody().containsKey("download_url")) {
+        if (response.getBody() == null) {
+            throw new RuntimeException("Received empty response from external API.");
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+
+        if (!responseBody.containsKey("download_url")) {
             throw new RuntimeException("Failed to retrieve download URL from external API.");
         }
 
-        String downloadLink = (String) response.getBody().get("download_url");
+        String downloadLink = (String) responseBody.get("download_url");
 
         String outputDir = System.getProperty("java.io.tmpdir");
         File downloadedFile = new File(outputDir, UUID.randomUUID().toString() + "." + format);
