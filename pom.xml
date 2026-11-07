@@ -15,7 +15,6 @@
     <artifactId>econverter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>econverter</name>
-    <description>EconverterS Media Application</description>
 
     <properties>
         <java.version>17</java.version>
