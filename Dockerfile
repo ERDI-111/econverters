@@ -1,27 +1,28 @@
 FROM eclipse-temurin:17-jdk-jammy
 
-# Add deadsnakes PPA to get Python 3.11+ (bypassing the deprecation error)
-RUN apt-get update && apt-get install -y software-properties-common \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt-get update && apt-get install -y \
-    python3.11 \
-    python3.11-distutils \
-    ffmpeg \
+# Install base utilities, curl, unzip, and system maven
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
     curl \
     unzip \
     maven \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Python 3.11 as the default python3
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+# Install the absolute latest static build of ffmpeg directly from John Van Sickle's builds
+RUN curl -L https://www.johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o ffmpeg.tar.xz \
+    && mkdir -p /tmp/ffmpeg \
+    && tar -xf ffmpeg.tar.xz -C /tmp/ffmpeg --strip-components=1 \
+    && cp /tmp/ffmpeg/ffmpeg /usr/local/bin/ \
+    && cp /tmp/ffmpeg/ffprobe /usr/local/bin/ \
+    && rm -rf ffmpeg.tar.xz /tmp/ffmpeg
 
-# Install pip for Python 3.11
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+# Install the absolute latest yt-dlp binary directly from GitHub (bypassing outdated pip packages)
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+    && chmod a+rx /usr/local/bin/yt-dlp
 
-# Install latest yt-dlp
-RUN python3 -m pip install --no-cache-dir --upgrade yt-dlp
-
-# Install Deno for signature decryption
+# Install Deno for JS runtime challenge solving
 RUN curl -fsSL https://deno.land/install.sh | sh
 ENV PATH="/root/.deno/bin:$PATH"
 
