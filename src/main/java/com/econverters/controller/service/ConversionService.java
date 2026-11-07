@@ -19,7 +19,8 @@ public class ConversionService {
             processBuilder = new ProcessBuilder(
                 "yt-dlp",
                 "-4",
-                "--extractor-args", "youtube:player_client=web",
+                "--extractor-args", "youtube:player_client=ios,web",
+                "--user-agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
                 "-x", "--audio-format", "mp3",
                 "-o", outputTemplate,
                 videoUrl
@@ -28,7 +29,8 @@ public class ConversionService {
             processBuilder = new ProcessBuilder(
                 "yt-dlp",
                 "-4",
-                "--extractor-args", "youtube:player_client=web",
+                "--extractor-args", "youtube:player_client=ios,web",
+                "--user-agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
                 "-f", "bestvideo+bestaudio/best",
                 "--merge-output-format", "mp4",
                 "-o", outputTemplate,
