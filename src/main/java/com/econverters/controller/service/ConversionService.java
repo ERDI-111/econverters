@@ -1,64 +1,37 @@
 package com.econverters.service;
 
 import org.springframework.stereotype.Service;
-import java.io.BufferedReader;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
 import java.io.File;
-import java.io.InputStreamReader;
+import java.net.URL;
+import org.apache.commons.io.FileUtils;
 import java.util.UUID;
 
 @Service
 public class ConversionService {
 
     public File convertMedia(String videoUrl, String format) throws Exception {
+        // Example using a public or RapidAPI endpoint provider
+        // You can plug in any reliable third-party video download API here
+        String apiUrl = "https://your-chosen-rapid-api-endpoint.com/download?url=" + videoUrl + "&format=" + format;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-RapidAPI-Key", "YOUR_API_KEY_HERE"); // Optional if using RapidAPI
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // Call external API to get the direct media file URL
+        ResponseEntity response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, Map.class);
+        
+        // Extract direct file download link provided by the API
+        String downloadLink = (String) response.getBody().get("download_url");
+
+        // Download the file locally to temp directory to stream to user
         String outputDir = System.getProperty("java.io.tmpdir");
-        String fileName = UUID.randomUUID().toString();
-        String outputTemplate = outputDir + "/" + fileName + ".%(ext)s";
+        File downloadedFile = new File(outputDir, UUID.randomUUID().toString() + "." + format);
+        FileUtils.copyURLToFile(new URL(downloadLink), downloadedFile);
 
-        ProcessBuilder processBuilder;
-        if ("mp3".equalsIgnoreCase(format)) {
-            processBuilder = new ProcessBuilder(
-                "yt-dlp",
-                "-4",
-                "--extractor-args", "youtube:player_client=android,web",
-                "--skip-download", "--no-check-certificates",
-                "-x", "--audio-format", "mp3",
-                "-o", outputTemplate,
-                videoUrl
-            );
-        } else {
-            processBuilder = new ProcessBuilder(
-                "yt-dlp",
-                "-4",
-                "--extractor-args", "youtube:player_client=android,web",
-                "--no-check-certificates",
-                "-f", "bestvideo+bestaudio/best",
-                "--merge-output-format", "mp4",
-                "-o", outputTemplate,
-                videoUrl
-            );
-        }
-
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-        }
-
-        int exitCode = process.waitFor();
-        if (exitCode != 0) {
-            throw new RuntimeException("yt-dlp extraction failed.");
-        }
-
-        File dir = new File(outputDir);
-        File[] matchedFiles = dir.listFiles((d, name) -> name.startsWith(fileName));
-        if (matchedFiles != null && matchedFiles.length > 0) {
-            return matchedFiles[0];
-        }
-
-        throw new RuntimeException("Converted output file not found.");
+        return downloadedFile;
     }
 }
