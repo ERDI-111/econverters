@@ -18,7 +18,8 @@ public class ConversionService {
         if ("mp3".equalsIgnoreCase(format)) {
             processBuilder = new ProcessBuilder(
                 "yt-dlp",
-                "--extractor-args", "youtube:player_client=android",
+                "-4",
+                "--extractor-args", "youtube:player_client=web",
                 "-x", "--audio-format", "mp3",
                 "-o", outputTemplate,
                 videoUrl
@@ -26,7 +27,8 @@ public class ConversionService {
         } else {
             processBuilder = new ProcessBuilder(
                 "yt-dlp",
-                "--extractor-args", "youtube:player_client=android",
+                "-4",
+                "--extractor-args", "youtube:player_client=web",
                 "-f", "bestvideo+bestaudio/best",
                 "--merge-output-format", "mp4",
                 "-o", outputTemplate,
